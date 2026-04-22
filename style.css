@@ -359,6 +359,14 @@ canvas#wheel {
 .h-dot.black { background: rgba(255,255,255,0.05); border-color: var(--border); color: #aaa; }
 .h-dot.green { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--green); }
 
+/* ── NOTE ODDS ── */
+.odds-note {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-style: italic;
+  padding: 2px 4px;
+}
+
 /* ── DIVIDER ── */
 .divider {
   width: 100%;
@@ -378,3 +386,22 @@ canvas#wheel {
 .page > *:nth-child(4) { animation-delay: 0.2s; }
 .page > *:nth-child(5) { animation-delay: 0.26s; }
 .page > *:nth-child(6) { animation-delay: 0.32s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 360px) {
+  .wheel-container,
+  canvas#wheel { width: 280px; height: 280px; }
+  .result-chip { width: 58px; height: 58px; font-size: 1.6rem; }
+}
+
+/* Respect du paramètre "réduire les animations" */
+@media (prefers-reduced-motion: reduce) {
+  .page > * { animation: none; }
+  .cat-card,
+  .cat-card::before,
+  .cat-name,
+  .cat-val,
+  .cat-mult,
+  .result-chip,
+  .wheel-container::before { transition: none; }
+}
