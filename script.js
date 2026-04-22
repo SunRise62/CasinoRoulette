@@ -1,20 +1,23 @@
-// ── Data ──
+// ── Constants ──
 const SEQ = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
 const RED = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
-const SLICE = (2 * Math.PI) / 37;
+const TAU          = 2 * Math.PI;
+const SLICE        = TAU / 37;
+const RESULT_DELAY = 250;  // ms avant d'afficher le jeton après l'arrêt de la roue
+const LIGHT_STEP   = 120;  // ms entre chaque carte de catégorie qui s'allume
 
 function color(n) { return n === 0 ? 'green' : RED.has(n) ? 'red' : 'black'; }
 
 // ── Canvas ──
 const canvas = document.getElementById('wheel');
-const ctx = canvas.getContext('2d');
+const ctx    = canvas.getContext('2d');
 const W = 320, R = 152, CX = 160, CY = 160;
 
 function drawWheel(a) {
   ctx.clearRect(0, 0, W, W);
 
   ctx.beginPath();
-  ctx.arc(CX, CY, R + 2, 0, 2 * Math.PI);
+  ctx.arc(CX, CY, R + 2, 0, TAU);
   ctx.fillStyle = '#0a0a0f';
   ctx.fill();
 
@@ -59,13 +62,13 @@ function drawWheel(a) {
   });
 
   [
-    { r: R,     w: 1,   col: 'rgba(255,255,255,0.08)' },
+    { r: R,      w: 1,  col: 'rgba(255,255,255,0.08)' },
     { r: R - 20, w: 12, col: 'rgba(255,255,255,0.02)' },
     { r: R - 20, w: 1,  col: 'rgba(255,255,255,0.06)' },
     { r: R - 28, w: 1,  col: 'rgba(255,255,255,0.04)' },
   ].forEach(({ r, w, col }) => {
     ctx.beginPath();
-    ctx.arc(CX, CY, r, 0, 2 * Math.PI);
+    ctx.arc(CX, CY, r, 0, TAU);
     ctx.strokeStyle = col;
     ctx.lineWidth = w;
     ctx.stroke();
@@ -86,7 +89,7 @@ function drawWheel(a) {
   cg.addColorStop(0, '#2a2a3a');
   cg.addColorStop(1, '#111118');
   ctx.beginPath();
-  ctx.arc(CX, CY, 26, 0, 2 * Math.PI);
+  ctx.arc(CX, CY, 26, 0, TAU);
   ctx.fillStyle = cg;
   ctx.fill();
   ctx.strokeStyle = 'rgba(255,255,255,0.1)';
@@ -94,14 +97,22 @@ function drawWheel(a) {
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.arc(CX, CY, 5, 0, 2 * Math.PI);
+  ctx.arc(CX, CY, 5, 0, TAU);
   ctx.fillStyle = 'rgba(255,255,255,0.15)';
   ctx.fill();
 }
 
 drawWheel(0);
 
-// ── Spin ──
+// ── DOM refs (mis en cache pour éviter des lookups répétés) ──
+const spinBtn   = document.getElementById('spin-btn');
+const resChip   = document.getElementById('res-chip');
+const resMain   = document.getElementById('res-main');
+const resSub    = document.getElementById('res-sub');
+const wheelCont = document.getElementById('wheel-container');
+const histEl    = document.getElementById('history');
+
+// ── State ──
 let angle = 0;
 let spinning = false;
 let hist = [];
@@ -109,95 +120,115 @@ let hist = [];
 function spin() {
   if (spinning) return;
   spinning = true;
-  document.getElementById('spin-btn').disabled = true;
+  spinBtn.disabled = true;
 
-  const chip = document.getElementById('res-chip');
-  chip.className = 'result-chip';
-  chip.textContent = '—';
-  document.getElementById('res-main').textContent = '…';
-  document.getElementById('res-sub').textContent = '\u00a0';
+  resChip.className = 'result-chip';
+  resChip.textContent = '—';
+  resMain.textContent = '…';
+  resSub.textContent = ' ';
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('lit'));
-  ['color','parity','range','dozen','col','num'].forEach(k => {
-    document.getElementById('cv-' + k).textContent = '—';
+  ['color', 'parity', 'range', 'dozen', 'col', 'num'].forEach(k => {
+    const el = document.getElementById('cv-' + k);
+    if (el) el.textContent = '—';
   });
-  document.getElementById('wheel-container').style.setProperty('--wheel-glow', 'rgba(124,111,255,0.1)');
+  wheelCont.style.setProperty('--wheel-glow', 'rgba(124,111,255,0.1)');
 
   const result = Math.floor(Math.random() * 37);
-  const idx = SEQ.indexOf(result);
+  const idx    = SEQ.indexOf(result);
   const target = -(idx * SLICE);
-  const extra = (7 + Math.floor(Math.random() * 5)) * 2 * Math.PI;
-  const from = angle;
-  const to = target - extra;
+  const extra  = (7 + Math.floor(Math.random() * 5)) * TAU;
+  const from   = angle;
+  const to     = target - extra;
   const duration = 5000;
   const t0 = performance.now();
 
   function frame(now) {
-    const t = Math.min((now - t0) / duration, 1);
+    const t    = Math.min((now - t0) / duration, 1);
     const ease = 1 - Math.pow(1 - t, 4);
     drawWheel(from + (to - from) * ease);
     if (t < 1) { requestAnimationFrame(frame); return; }
-    angle = to % (2 * Math.PI);
+    // Normalise à [0, TAU) pour éviter la dérive flottante sur de nombreux tours
+    angle = ((to % TAU) + TAU) % TAU;
     drawWheel(angle);
     spinning = false;
-    document.getElementById('spin-btn').disabled = false;
+    spinBtn.disabled = false;
     showResult(result);
   }
   requestAnimationFrame(frame);
 }
 
+function getCategories(n) {
+  return {
+    color:  color(n) === 'red' ? 'Rouge' : 'Noir',
+    parity: n % 2 === 0 ? 'Pair' : 'Impair',
+    range:  n <= 18 ? 'Manque (1–18)' : 'Passe (19–36)',
+    dozen:  n <= 12 ? '1re douzaine' : n <= 24 ? '2e douzaine' : '3e douzaine',
+    col:    n % 3 === 1 ? '1re colonne' : n % 3 === 2 ? '2e colonne' : '3e colonne',
+  };
+}
+
 function showResult(n) {
   const c = color(n);
-
   const glow = c === 'red' ? 'rgba(229,69,58,0.12)' : c === 'green' ? 'rgba(34,197,94,0.1)' : 'rgba(255,255,255,0.04)';
-  document.getElementById('wheel-container').style.setProperty('--wheel-glow', glow);
+  wheelCont.style.setProperty('--wheel-glow', glow);
 
   setTimeout(() => {
-    const chip = document.getElementById('res-chip');
-    chip.textContent = n;
-    chip.className = 'result-chip ' + c;
+    resChip.textContent = n;
+    resChip.className = 'result-chip ' + c;
 
     const colorLabel = c === 'red' ? 'Rouge' : c === 'black' ? 'Noir' : 'Vert (zéro)';
-    document.getElementById('res-main').textContent = n === 0 ? 'Zéro — Vert' : `${n} — ${colorLabel}`;
-    document.getElementById('res-sub').textContent = n === 0
+    resMain.textContent = n === 0 ? 'Zéro — Vert' : `${n} — ${colorLabel}`;
+    resSub.textContent  = n === 0
       ? 'Les mises simples ne gagnent pas (sauf variante en prison)'
       : (n % 2 === 0 ? 'Pair' : 'Impair') + ' · ' + (n <= 18 ? 'Manque (1–18)' : 'Passe (19–36)');
 
     if (n === 0) {
-      setTimeout(() => light('cat-num', 'cv-num', '0'), 60);
+      setTimeout(() => light('cat-num', 'cv-num', '0'), LIGHT_STEP);
     } else {
-      const colorVal  = c === 'red' ? 'Rouge' : 'Noir';
-      const parityVal = n % 2 === 0 ? 'Pair' : 'Impair';
-      const rangeVal  = n <= 18 ? 'Manque (1–18)' : 'Passe (19–36)';
-      const dozVal    = n <= 12 ? '1re douzaine' : n <= 24 ? '2e douzaine' : '3e douzaine';
-      const colVal    = n % 3 === 1 ? '1re colonne' : n % 3 === 2 ? '2e colonne' : '3e colonne';
-
-      setTimeout(() => light('cat-color',  'cv-color',  colorVal),  60);
-      setTimeout(() => light('cat-parity', 'cv-parity', parityVal), 180);
-      setTimeout(() => light('cat-range',  'cv-range',  rangeVal),  300);
-      setTimeout(() => light('cat-dozen',  'cv-dozen',  dozVal),    420);
-      setTimeout(() => light('cat-col',    'cv-col',    colVal),    540);
-      setTimeout(() => light('cat-num',    'cv-num',    `${n}`),    660);
+      const cats = getCategories(n);
+      [
+        ['cat-color',  'cv-color',  cats.color],
+        ['cat-parity', 'cv-parity', cats.parity],
+        ['cat-range',  'cv-range',  cats.range],
+        ['cat-dozen',  'cv-dozen',  cats.dozen],
+        ['cat-col',    'cv-col',    cats.col],
+        ['cat-num',    'cv-num',    `${n}`],
+      ].forEach(([cardId, valId, val], i) => {
+        setTimeout(() => light(cardId, valId, val), LIGHT_STEP * (i + 1));
+      });
     }
-  }, 250);
 
-  hist.unshift(n);
-  if (hist.length > 20) hist.pop();
-  renderHist();
+    hist.unshift(n);
+    if (hist.length > 20) hist.pop();
+    renderHist();
+  }, RESULT_DELAY);
 }
 
 function light(cardId, valId, val) {
-  document.getElementById(cardId).classList.add('lit');
-  document.getElementById(valId).textContent = val;
+  const card = document.getElementById(cardId);
+  const el   = document.getElementById(valId);
+  if (card) card.classList.add('lit');
+  if (el)   el.textContent = val;
 }
 
 function renderHist() {
-  const el = document.getElementById('history');
-  el.innerHTML = '';
-  hist.forEach((n, i) => {
-    const d = document.createElement('div');
-    d.className = 'h-dot ' + color(n);
-    d.textContent = n;
-    d.style.opacity = Math.max(0.2, 1 - i * 0.04);
-    el.appendChild(d);
-  });
+  histEl.replaceChildren(
+    ...hist.map((n, i) => {
+      const d = document.createElement('div');
+      d.className = 'h-dot ' + color(n);
+      d.textContent = n;
+      d.style.opacity = Math.max(0.2, 1 - i * 0.04);
+      return d;
+    })
+  );
 }
+
+spinBtn.addEventListener('click', spin);
+
+// Raccourci clavier : Espace ou Entrée pour lancer la roue
+document.addEventListener('keydown', e => {
+  if ((e.key === ' ' || e.key === 'Enter') && !spinning) {
+    e.preventDefault();
+    spin();
+  }
+});
