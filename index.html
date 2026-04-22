@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roulette</title>
+<title>Roulette Européenne</title>
+<meta name="description" content="Simulateur de roulette européenne — 37 numéros, résultat détaillé et historique des tirages.">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -23,18 +24,18 @@
         <div class="pointer-tri"></div>
         <div class="pointer-dot"></div>
       </div>
-      <canvas id="wheel" width="320" height="320"></canvas>
+      <canvas id="wheel" width="320" height="320" role="img" aria-label="Roue de roulette européenne"></canvas>
     </div>
 
     <div class="result-row">
       <div class="result-chip" id="res-chip">—</div>
-      <div class="result-meta">
+      <div class="result-meta" role="status" aria-live="polite" aria-atomic="true">
         <div class="result-meta-main" id="res-main">Appuie sur Tourner</div>
         <div class="result-meta-sub" id="res-sub">&nbsp;</div>
       </div>
     </div>
 
-    <button class="spin-btn" id="spin-btn" onclick="spin()">Tourner la roue</button>
+    <button class="spin-btn" id="spin-btn">Tourner la roue</button>
   </div>
 
   <div class="divider"></div>
@@ -162,7 +163,7 @@
         <div class="odds-mult">×2</div>
       </div>
     </div>
-    <div style="font-size:0.72rem; color:var(--muted); font-style:italic; padding: 2px 4px;">
+    <div class="odds-note">
       Le ×36 sur numéro plein signifie que tu récupères ta mise initiale + 35 fois cette mise.
     </div>
   </div>
