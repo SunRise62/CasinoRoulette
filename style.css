@@ -1,8 +1,11 @@
 :root {
-  --bg:       #0d0d0f;
-  --surface:  #13131a;
-  --surface2: #1a1a24;
-  --border:   rgba(255,255,255,0.07);
+  --bg:       #080810;
+  --surface:  #10101a;
+  --surface2: #18182a;
+  --border:   rgba(200,170,80,0.12);
+  --border2:  rgba(255,255,255,0.06);
+  --gold:     #c8a840;
+  --gold2:    #e8c860;
   --red:      #e5453a;
   --red-glow: rgba(229,69,58,0.25);
   --green:    #22c55e;
@@ -11,7 +14,7 @@
   --accent2:  #a78bfa;
   --text:     #f0f0f5;
   --muted:    #6b6b80;
-  --muted2:   #3a3a4a;
+  --muted2:   #2e2e40;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -19,7 +22,8 @@ html { font-size: 16px; }
 body {
   background: var(--bg);
   background-image:
-    radial-gradient(ellipse 70% 40% at 50% -5%, rgba(124,111,255,0.07) 0%, transparent 70%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(200,168,64,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(124,111,255,0.04) 0%, transparent 70%);
   min-height: 100vh;
   font-family: 'DM Sans', sans-serif;
   color: var(--text);
@@ -50,18 +54,22 @@ body {
 .header-title {
   font-family: 'DM Serif Display', serif;
   font-size: 1.6rem;
-  letter-spacing: -0.02em;
-  color: var(--text);
+  letter-spacing: -0.01em;
+  background: linear-gradient(135deg, var(--gold2) 0%, var(--gold) 60%, #a07820 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .header-badge {
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--gold);
   padding: 4px 10px;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(200,168,64,0.3);
   border-radius: 100px;
+  opacity: 0.7;
 }
 
 /* ── ROUE ── */
@@ -82,9 +90,9 @@ body {
 .wheel-container::before {
   content: '';
   position: absolute;
-  inset: -20px;
+  inset: -24px;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--wheel-glow, rgba(124,111,255,0.08)) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--wheel-glow, rgba(200,168,64,0.06)) 0%, transparent 70%);
   transition: background 0.8s;
   pointer-events: none;
   z-index: 0;
@@ -96,34 +104,34 @@ canvas#wheel {
   position: relative;
   z-index: 1;
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.06),
-    0 24px 80px rgba(0,0,0,0.7);
+    0 0 0 2px rgba(200,168,64,0.2),
+    0 0 0 4px rgba(200,168,64,0.08),
+    0 32px 100px rgba(0,0,0,0.85);
 }
 
 .pointer {
   position: absolute;
-  top: -6px;
+  top: -8px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
 }
 .pointer-tri {
   width: 0; height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 18px solid var(--text);
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 20px solid var(--gold2);
+  filter: drop-shadow(0 2px 6px rgba(200,168,64,0.5));
 }
 .pointer-dot {
-  width: 8px; height: 8px;
+  width: 7px; height: 7px;
   border-radius: 50%;
-  background: var(--text);
-  margin-top: -2px;
-  box-shadow: 0 0 8px rgba(255,255,255,0.4);
+  background: var(--gold2);
+  margin-top: -3px;
+  box-shadow: 0 0 8px rgba(200,168,64,0.6);
 }
 
 /* ── RÉSULTAT ── */
@@ -140,14 +148,14 @@ canvas#wheel {
   font-family: 'DM Serif Display', serif;
   font-size: 2rem;
   font-weight: 400;
-  border: 2px solid var(--border);
+  border: 2px solid var(--border2);
   background: var(--surface);
   transition: all 0.5s;
   flex-shrink: 0;
   box-shadow: 0 0 0 0 transparent;
 }
 .result-chip.red   { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 0 40px var(--red-glow); }
-.result-chip.black { background: #222; border-color: #444; color: #fff; }
+.result-chip.black { background: #1a1a22; border-color: #333340; color: #fff; }
 .result-chip.green { background: var(--green); border-color: var(--green); color: #000; box-shadow: 0 0 40px var(--green-glow); }
 
 .result-meta {
@@ -173,7 +181,7 @@ canvas#wheel {
   width: 100%;
   max-width: 320px;
   padding: 15px;
-  background: var(--accent);
+  background: linear-gradient(135deg, #6a5fe0 0%, #8070f0 100%);
   border: none;
   border-radius: 12px;
   color: #fff;
@@ -184,15 +192,17 @@ canvas#wheel {
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 8px 32px rgba(124,111,255,0.3);
+  box-shadow:
+    0 8px 32px rgba(124,111,255,0.35),
+    0 1px 0 rgba(255,255,255,0.1) inset;
 }
 .spin-btn:hover:not(:disabled) {
-  background: #9580ff;
-  box-shadow: 0 8px 40px rgba(124,111,255,0.45);
+  background: linear-gradient(135deg, #7a6ff0 0%, #9080ff 100%);
+  box-shadow: 0 8px 44px rgba(124,111,255,0.5);
   transform: translateY(-1px);
 }
 .spin-btn:disabled {
-  opacity: 0.35;
+  opacity: 0.3;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -211,7 +221,8 @@ canvas#wheel {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--gold);
+  opacity: 0.7;
 }
 
 .cats-grid {
@@ -222,7 +233,7 @@ canvas#wheel {
 
 .cat-card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border2);
   border-radius: 12px;
   padding: 14px 16px;
   display: flex;
@@ -239,14 +250,14 @@ canvas#wheel {
   position: absolute;
   left: 0; top: 0; bottom: 0;
   width: 3px;
-  background: var(--accent2);
+  background: linear-gradient(180deg, var(--gold2), var(--gold));
   transform: scaleY(0);
   transform-origin: bottom;
   transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
   border-radius: 0 2px 2px 0;
 }
 
-.cat-card.lit { border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.05); }
+.cat-card.lit { border-color: rgba(200,168,64,0.25); background: rgba(200,168,64,0.04); }
 .cat-card.lit::before { transform: scaleY(1); }
 
 .cat-left { display: flex; flex-direction: column; gap: 3px; }
@@ -261,7 +272,7 @@ canvas#wheel {
 .cat-val {
   font-family: 'DM Serif Display', serif;
   font-size: 1.05rem;
-  color: rgba(240,240,245,0.2);
+  color: rgba(240,240,245,0.15);
   transition: color 0.35s;
   min-height: 1.3em;
 }
@@ -279,64 +290,15 @@ canvas#wheel {
   flex-shrink: 0;
 }
 .cat-card.lit .cat-mult {
-  background: rgba(167,139,250,0.15);
-  color: var(--accent2);
+  background: rgba(200,168,64,0.12);
+  color: var(--gold2);
 }
 
-/* ── TABLEAU DES GAINS ── */
-.odds-section {
+/* ── DIVIDER ── */
+.divider {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.odds-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
-}
-
-.odds-header {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.odds-header::before {
-  content: '';
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--accent2);
-}
-
-.odds-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 11px 16px;
-  border-bottom: 1px solid var(--border);
-  gap: 12px;
-}
-.odds-row:last-child { border-bottom: none; }
-
-.odds-left { display: flex; flex-direction: column; gap: 2px; }
-.odds-name { font-size: 0.85rem; font-weight: 500; color: var(--text); }
-.odds-desc { font-size: 0.72rem; color: var(--muted); font-style: italic; }
-
-.odds-mult {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.1rem;
-  color: var(--accent2);
-  white-space: nowrap;
-  flex-shrink: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,168,64,0.15), transparent);
 }
 
 /* ── HISTORIQUE ── */
@@ -355,23 +317,131 @@ canvas#wheel {
   border: 1px solid transparent;
   transition: opacity 0.3s;
 }
-.h-dot.red   { background: rgba(229,69,58,0.2); border-color: rgba(229,69,58,0.4); color: var(--red); }
-.h-dot.black { background: rgba(255,255,255,0.05); border-color: var(--border); color: #aaa; }
-.h-dot.green { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--green); }
+.h-dot.red   { background: rgba(229,69,58,0.18); border-color: rgba(229,69,58,0.35); color: #ff8888; }
+.h-dot.black { background: rgba(255,255,255,0.04); border-color: var(--border2); color: #aaa; }
+.h-dot.green { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.25); color: var(--green); }
 
-/* ── NOTE ODDS ── */
+/* ── ACCORDION GAINS ── */
+.accordion-section {
+  width: 100%;
+}
+
+.accordion-btn {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s;
+}
+.accordion-btn:hover {
+  border-color: rgba(200,168,64,0.25);
+  background: rgba(200,168,64,0.03);
+}
+.accordion-btn[aria-expanded="true"] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+}
+
+.accordion-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+}
+.accordion-icon {
+  width: 16px; height: 16px;
+  color: var(--gold);
+  opacity: 0.5;
+  transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1);
+  flex-shrink: 0;
+}
+
+.accordion-body {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border2);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+}
+.accordion-body.open {
+  display: flex;
+  animation: slideDown 0.28s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.odds-card {
+  background: var(--surface);
+  overflow: hidden;
+}
+.odds-card + .odds-card {
+  border-top: 1px solid var(--border2);
+}
+
+.odds-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border2);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.odds-header::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.odds-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border2);
+  gap: 12px;
+}
+.odds-row:last-child { border-bottom: none; }
+
+.odds-left { display: flex; flex-direction: column; gap: 2px; }
+.odds-name { font-size: 0.85rem; font-weight: 500; color: var(--text); }
+.odds-desc { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+.odds-mult {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  color: var(--gold2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .odds-note {
   font-size: 0.72rem;
   color: var(--muted);
   font-style: italic;
-  padding: 2px 4px;
-}
-
-/* ── DIVIDER ── */
-.divider {
-  width: 100%;
-  height: 1px;
-  background: var(--border);
+  padding: 10px 16px;
+  background: var(--surface2);
+  border-top: 1px solid var(--border2);
 }
 
 /* ── ANIMATIONS ── */
@@ -386,6 +456,7 @@ canvas#wheel {
 .page > *:nth-child(4) { animation-delay: 0.2s; }
 .page > *:nth-child(5) { animation-delay: 0.26s; }
 .page > *:nth-child(6) { animation-delay: 0.32s; }
+.page > *:nth-child(7) { animation-delay: 0.36s; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 360px) {
@@ -394,14 +465,13 @@ canvas#wheel {
   .result-chip { width: 58px; height: 58px; font-size: 1.6rem; }
 }
 
-/* Respect du paramètre "réduire les animations" */
 @media (prefers-reduced-motion: reduce) {
   .page > * { animation: none; }
+  .accordion-body.open { animation: none; }
   .cat-card,
   .cat-card::before,
-  .cat-name,
-  .cat-val,
-  .cat-mult,
+  .cat-name, .cat-val, .cat-mult,
   .result-chip,
-  .wheel-container::before { transition: none; }
+  .wheel-container::before,
+  .accordion-icon { transition: none; }
 }
